@@ -41,6 +41,9 @@ const Header = () => {
       <Button color="inherit" component={Link} to="/error_page">
         ERROR PAGE
       </Button>
+      <Button color="inherit" href="https://github.com/Ashish93-mrx/loan-calculator" target="_blank">
+        MY GITHUB REPO
+      </Button>
       <ThemeToggle />
     </Box>
   );
@@ -85,6 +88,9 @@ const Header = () => {
               </Button>
               <Button color="inherit" component={Link} to="/error_page">
                 ERROR PAGE
+              </Button>
+              <Button color="inherit" href="https://github.com/Ashish93-mrx/loan-calculator" target="_blank">
+                MY GITHUB REPO
               </Button>
             </Box>
           )}
