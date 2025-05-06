@@ -88,7 +88,7 @@ const CurrencyConversion = () => {
   return (
     <Paper sx={{ p: 2 }}>
       <Typography variant="h6" gutterBottom>
-        Paginated Exchange Rates (Base: {selectedCurrency})
+      Live Exchange Rates (Base: {selectedCurrency})
       </Typography>
 
       <TableContainer sx={{ maxHeight: 600 }}>
