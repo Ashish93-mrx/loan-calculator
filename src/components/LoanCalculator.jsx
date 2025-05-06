@@ -92,6 +92,17 @@ const LoanCalculator = () => {
 
   const columns = ["Month", "Principal", "Interest", "Remaining Balance"];
 
+  const handleReset = () => {
+    setPrincipal("");
+    setRate("");
+    setYears("");
+    setPrincipalError("");
+    setRateError("");
+    setYearsError("");
+    calculateEMI(0, 0, 0);
+  };
+  
+
   const paginatedData = amortizationSchedule.slice(
     (page - 1) * rowsPerPage,
     page * rowsPerPage
@@ -188,11 +199,13 @@ const LoanCalculator = () => {
         </Button>
       </Box>
 
-      <Box sx={{ textAlign: "left", mb: 4 }}>
+
+      <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
         <CurrencyDropdown />
+        <Button variant="contained" onClick={handleReset}>Reset Table</Button>
       </Box>
 
-      {monthlyEMI != null && (
+      {amortizationSchedule?.length > 0 && monthlyEMI != null && (
         <Box component={Paper} p={3} mb={4}>
           <Typography variant="h6">
             Monthly EMI: {selectedCurrency} {convertedEMI}
@@ -210,11 +223,11 @@ const LoanCalculator = () => {
             <Table stickyHeader>
               <TableHead>
                 <TableRow>
-                  {columns.map((i) => (
-                    <TableCell>
-                      <strong>{i}</strong>
-                    </TableCell>
-                  ))}
+                {columns.map((col) => (
+                  <TableCell key={col}>
+                    <strong>{col}</strong>
+                  </TableCell>
+                ))}
                 </TableRow>
               </TableHead>
               <TableBody>
