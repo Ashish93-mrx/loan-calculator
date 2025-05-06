@@ -17,6 +17,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Grid
 } from "@mui/material";
 import useLoanCalculator from "../hooks/useLoanCalculator";
 import CurrencyDropdown from "./CurrencyDropdown";
@@ -37,6 +38,13 @@ const LoanCalculator = () => {
 
   const { monthlyEMI, amortizationSchedule, calculateEMI } =
     useLoanCalculator();
+
+    const numberInputStyles = {
+      "& input[type=number]::-webkit-outer-spin-button": { display: "none" },
+      "& input[type=number]::-webkit-inner-spin-button": { display: "none" },
+      "& input[type=number]": { MozAppearance: "textfield" },
+    };
+    
 
   const convertedEMI =
     selectedCurrency !== "USD" && rates[selectedCurrency]
@@ -114,84 +122,55 @@ const LoanCalculator = () => {
         Loan EMI Calculator
       </Typography>
 
-      <Box
-        component={Paper}
-        p={3}
-        mb={4}
-        sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}
-      >
-        <Box sx={{ flex: 1, px: 1.5 }}>
-          <TextField
-            fullWidth
-            label="Loan Amount"
-            type="number"
-            value={principal}
-            error={!!principalError}
-            helperText={principalError}
-            onChange={(e) => setPrincipal(e.target.value)}
-            margin="normal"
-            sx={{
-              "& input[type=number]::-webkit-outer-spin-button": {
-                display: "none",
-              },
-              "& input[type=number]::-webkit-inner-spin-button": {
-                display: "none",
-              },
-              "& input[type=number]": {
-                MozAppearance: "textfield",
-              },
-            }}
-          />
-        </Box>
+      <Box component={Paper} p={3} mb={4}>
+  <Grid container spacing={2}>
+    <Grid item xs={12} md={4}>
+      <TextField
+        fullWidth
+        label="Loan Amount"
+        type="number"
+        value={principal}
+        error={!!principalError}
+        helperText={principalError}
+        onChange={(e) => setPrincipal(e.target.value)}
+        margin="normal"
+        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+        sx={numberInputStyles}
+      />
+    </Grid>
 
-        <Box sx={{ flex: 1, px: 1.5 }}>
-          <TextField
-            fullWidth
-            label="Interest Rate (%)"
-            type="number"
-            value={rate}
-            error={!!rateError}
-            helperText={rateError}
-            onChange={(e) => setRate(e.target.value)}
-            margin="normal"
-            sx={{
-              "& input[type=number]::-webkit-outer-spin-button": {
-                display: "none",
-              },
-              "& input[type=number]::-webkit-inner-spin-button": {
-                display: "none",
-              },
-              "& input[type=number]": {
-                MozAppearance: "textfield",
-              },
-            }}
-          />
-        </Box>
+    <Grid item xs={12} md={4}>
+      <TextField
+        fullWidth
+        label="Interest Rate (%)"
+        type="number"
+        value={rate}
+        error={!!rateError}
+        helperText={rateError}
+        onChange={(e) => setRate(e.target.value)}
+        margin="normal"
+        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+        sx={numberInputStyles}
+      />
+    </Grid>
 
-        <Box sx={{ flex: 1, px: 1.5 }}>
-          <TextField
-            fullWidth
-            label="Term (Years)"
-            type="number"
-            value={years}
-            error={!!yearsError}
-            helperText={yearsError}
-            onChange={(e) => setYears(e.target.value)}
-            margin="normal"
-            sx={{
-              "& input[type=number]::-webkit-outer-spin-button": {
-                display: "none",
-              },
-              "& input[type=number]::-webkit-inner-spin-button": {
-                display: "none",
-              },
-              "& input[type=number]": {
-                MozAppearance: "textfield",
-              },
-            }}
-          />
-        </Box>
-      </Box>
+    <Grid item xs={12} md={4}>
+      <TextField
+        fullWidth
+        label="Term (Years)"
+        type="number"
+        value={years}
+        error={!!yearsError}
+        helperText={yearsError}
+        onChange={(e) => setYears(e.target.value)}
+        margin="normal"
+        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+        sx={numberInputStyles}
+      />
+    </Grid>
+  </Grid>
+</Box>
+
 
       <Box sx={{ textAlign: "left", mb: 2 }}>
         <Button variant="contained" color="primary" onClick={handleCalculate}>

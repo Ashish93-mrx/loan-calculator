@@ -11,6 +11,9 @@ import {
   useTheme,
   useMediaQuery,
   Divider,
+  List,
+  ListItem,
+  ListItemButton,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import ThemeToggle from "./ThemeToggle";
@@ -32,19 +35,35 @@ const Header = () => {
         Loan Calculator
       </Typography>
       <Divider />
-      <Button color="inherit" component={Link} to="/">
-        Home
-      </Button>
-      <Button color="inherit" component={Link} to="/exchange_rates_live">
-        Exchange Rates (Live)
-      </Button>
-      <Button color="inherit" component={Link} to="/error_page">
-        ERROR PAGE
-      </Button>
-      <Button color="inherit" href="https://github.com/Ashish93-mrx/loan-calculator" target="_blank">
-        MY GITHUB REPO
-      </Button>
-      <ThemeToggle />
+      <List>
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/">
+            <Typography>Home</Typography>
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/exchange_rates_live">
+            <Typography>Exchange Rates (Live)</Typography>
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/error_page">
+            <Typography>ERROR PAGE</Typography>
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton
+            component="a"
+            href="https://github.com/Ashish93-mrx/loan-calculator"
+            target="_blank"
+          >
+            <Typography>MY GITHUB REPO</Typography>
+          </ListItemButton>
+        </ListItem>
+        <ListItem>
+          <ThemeToggle />
+        </ListItem>
+      </List>
     </Box>
   );
 
@@ -89,12 +108,16 @@ const Header = () => {
               <Button color="inherit" component={Link} to="/error_page">
                 ERROR PAGE
               </Button>
-              <Button color="inherit" href="https://github.com/Ashish93-mrx/loan-calculator" target="_blank">
+              <Button
+                color="inherit"
+                href="https://github.com/Ashish93-mrx/loan-calculator"
+                target="_blank"
+              >
                 MY GITHUB REPO
               </Button>
+              <ThemeToggle />
             </Box>
           )}
-          <ThemeToggle />
         </Toolbar>
       </AppBar>
 
