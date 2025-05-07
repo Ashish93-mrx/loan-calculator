@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TextField,
   Button,
@@ -17,7 +17,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Grid
+  Grid,
 } from "@mui/material";
 import useLoanCalculator from "../hooks/useLoanCalculator";
 import CurrencyDropdown from "./CurrencyDropdown";
@@ -25,9 +25,9 @@ import useExchangeRates from "../hooks/useExchangeRates";
 import { useThemeMode } from "../context/ThemeContextProvider";
 
 const LoanCalculator = () => {
-  const [principal, setPrincipal] = useState("");
-  const [rate, setRate] = useState("");
-  const [years, setYears] = useState("");
+  const [principal, setPrincipal] = useState(100000);
+  const [rate, setRate] = useState(8.5);
+  const [years, setYears] = useState(5);
   const [principalError, setPrincipalError] = useState("");
   const [rateError, setRateError] = useState("");
   const [yearsError, setYearsError] = useState("");
@@ -35,22 +35,20 @@ const LoanCalculator = () => {
   const { rates, loading } = useExchangeRates();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rateMultiplier, setRateMultiplier] = useState(null);
+  const [localMonthlyEmi, setLocalMonthlyEmi] = useState(null);
+  const [localAmortization, setLocalAmortization] = useState([]);
 
   const { monthlyEMI, amortizationSchedule, calculateEMI } =
     useLoanCalculator();
 
-    const numberInputStyles = {
-      "& input[type=number]::-webkit-outer-spin-button": { display: "none" },
-      "& input[type=number]::-webkit-inner-spin-button": { display: "none" },
-      "& input[type=number]": { MozAppearance: "textfield" },
-    };
-    
+  const numberInputStyles = {
+    "& input[type=number]::-webkit-outer-spin-button": { display: "none" },
+    "& input[type=number]::-webkit-inner-spin-button": { display: "none" },
+    "& input[type=number]": { MozAppearance: "textfield" },
+  };
 
-  const convertedEMI =
-    selectedCurrency !== "USD" && rates[selectedCurrency]
-      ? (monthlyEMI * rates[selectedCurrency]).toFixed(2)
-      : monthlyEMI;
-
+  let dollarsMonthlyEmi = monthlyEMI;
   const handleCalculate = () => {
     let hasError = false;
 
@@ -109,12 +107,14 @@ const LoanCalculator = () => {
     setYearsError("");
     calculateEMI(0, 0, 0);
   };
-  
 
-  const paginatedData = amortizationSchedule.slice(
-    (page - 1) * rowsPerPage,
-    page * rowsPerPage
-  );
+  useEffect(() => {
+    setLocalMonthlyEmi(monthlyEMI);
+    setLocalAmortization(amortizationSchedule);
+    setRateMultiplier(
+      selectedCurrency === "USD" ? 1 : rates[selectedCurrency] || 1
+    );
+  }, [selectedCurrency, monthlyEMI, amortizationSchedule]);
 
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
@@ -123,54 +123,53 @@ const LoanCalculator = () => {
       </Typography>
 
       <Box component={Paper} p={3} mb={4}>
-  <Grid container spacing={2}>
-    <Grid item xs={12} md={4}>
-      <TextField
-        fullWidth
-        label="Loan Amount"
-        type="number"
-        value={principal}
-        error={!!principalError}
-        helperText={principalError}
-        onChange={(e) => setPrincipal(e.target.value)}
-        margin="normal"
-        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-        sx={numberInputStyles}
-      />
-    </Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label="Loan Amount"
+              type="number"
+              value={principal}
+              error={!!principalError}
+              helperText={principalError}
+              onChange={(e) => setPrincipal(e.target.value)}
+              margin="normal"
+              inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+              sx={numberInputStyles}
+            />
+          </Grid>
 
-    <Grid item xs={12} md={4}>
-      <TextField
-        fullWidth
-        label="Interest Rate (%)"
-        type="number"
-        value={rate}
-        error={!!rateError}
-        helperText={rateError}
-        onChange={(e) => setRate(e.target.value)}
-        margin="normal"
-        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-        sx={numberInputStyles}
-      />
-    </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label="Interest Rate (%)"
+              type="number"
+              value={rate}
+              error={!!rateError}
+              helperText={rateError}
+              onChange={(e) => setRate(e.target.value)}
+              margin="normal"
+              inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+              sx={numberInputStyles}
+            />
+          </Grid>
 
-    <Grid item xs={12} md={4}>
-      <TextField
-        fullWidth
-        label="Term (Years)"
-        type="number"
-        value={years}
-        error={!!yearsError}
-        helperText={yearsError}
-        onChange={(e) => setYears(e.target.value)}
-        margin="normal"
-        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-        sx={numberInputStyles}
-      />
-    </Grid>
-  </Grid>
-</Box>
-
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label="Term (Years)"
+              type="number"
+              value={years}
+              error={!!yearsError}
+              helperText={yearsError}
+              onChange={(e) => setYears(e.target.value)}
+              margin="normal"
+              inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+              sx={numberInputStyles}
+            />
+          </Grid>
+        </Grid>
+      </Box>
 
       <Box sx={{ textAlign: "left", mb: 2 }}>
         <Button variant="contained" color="primary" onClick={handleCalculate}>
@@ -178,16 +177,28 @@ const LoanCalculator = () => {
         </Button>
       </Box>
 
-
-      <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+      <Box
+        sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}
+      >
         <CurrencyDropdown />
-        <Button variant="contained" onClick={handleReset}>Reset Table</Button>
+        <h4>
+          Converted EMI:{" "}
+          {localMonthlyEmi &&
+          selectedCurrency !== "USD" &&
+          rates[selectedCurrency]
+            ? (localMonthlyEmi * rates[selectedCurrency]).toFixed(2)
+            : localMonthlyEmi ?? 0}
+          {selectedCurrency}
+        </h4>
+        <Button variant="contained" onClick={() => handleReset()}>
+          Reset Table
+        </Button>
       </Box>
 
-      {amortizationSchedule?.length > 0 && monthlyEMI != null && (
+      {amortizationSchedule?.length > 0 && localMonthlyEmi != null && (
         <Box component={Paper} p={3} mb={4}>
           <Typography variant="h6">
-            Monthly EMI: {selectedCurrency} {convertedEMI}
+            Monthly EMI: $ {dollarsMonthlyEmi}
           </Typography>
         </Box>
       )}
@@ -202,31 +213,33 @@ const LoanCalculator = () => {
             <Table stickyHeader>
               <TableHead>
                 <TableRow>
-                {columns.map((col) => (
-                  <TableCell key={col}>
-                    <strong>{col}</strong>
-                  </TableCell>
-                ))}
+                  {columns.map((col) => (
+                    <TableCell key={col}>
+                      <strong>{col}</strong>
+                    </TableCell>
+                  ))}
                 </TableRow>
               </TableHead>
               <TableBody>
-                {paginatedData.map((item, idx) => (
-                  <TableRow key={idx}>
-                    <TableCell>{item.month}</TableCell>
-                    <TableCell>
-                      {item.principalComponent?.toFixed(2) ?? "-"}{" "}
-                      {selectedCurrency}
-                    </TableCell>
-                    <TableCell>
-                      {item.interestComponent?.toFixed(2) ?? "-"}{" "}
-                      {selectedCurrency}
-                    </TableCell>
-                    <TableCell>
-                      {item.remainingBalance?.toFixed(2) ?? "-"}{" "}
-                      {selectedCurrency}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {localAmortization
+                  .slice((page - 1) * rowsPerPage, page * rowsPerPage)
+                  .map((item, idx) => (
+                    <TableRow key={idx}>
+                      <TableCell>{item.month}</TableCell>
+                      <TableCell>
+                        {(item.principalComponent * rateMultiplier).toFixed(2)}{" "}
+                        {selectedCurrency}
+                      </TableCell>
+                      <TableCell>
+                        {(item.interestComponent * rateMultiplier).toFixed(2)}{" "}
+                        {selectedCurrency}
+                      </TableCell>
+                      <TableCell>
+                        {(item.remainingBalance * rateMultiplier).toFixed(2)}{" "}
+                        {selectedCurrency}
+                      </TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           </TableContainer>

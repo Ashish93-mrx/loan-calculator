@@ -13,7 +13,7 @@ const useExchangeRates = () => {
     const fetchRates = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(EXCHANGE_RATE_API + selectedCurrency);
+        const response = await axios.get(EXCHANGE_RATE_API + 'USD');
         setRates(response.data.conversion_rates);
       } catch (error) {
         setError("Failed to fetch exchange rates");
